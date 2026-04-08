@@ -1,0 +1,133 @@
+✅ Step 0: Prerequisites
+Before starting, make sure you have Node.js installed. You can download it from nodejs.org.
+
+💻 Part 1: Setting Up SQL Server
+This involves installing the free SQL Server Express and its management tool.
+
+Install SQL Server Express:
+
+Go to the SQL Server Express download page and download the installer (the "Basic" package is fine).
+
+Run the installer you just downloaded. Follow the default settings, which will install a "default instance" named SQLEXPRESS. This will also install the SQL Server database engine service.
+
+When you get to the Database Engine Configuration screen, select "Mixed Mode" authentication. This lets you log in with either Windows or SQL Server accounts.
+
+You'll be asked to set a password for the sa (system administrator) account. Choose a strong password and write it down (you'll need it later).
+
+Install SQL Server Management Studio (SSMS):
+
+Download the latest SSMS from the Microsoft SSMS download page.
+
+Run the installer and follow the prompts to install the management tool.
+
+Create the Database:
+
+Open SQL Server Management Studio (SSMS) from your Start menu.
+
+In the "Connect to Server" window, enter your server name (e.g., localhost\SQLEXPRESS or just . if using a default instance) and click "Connect".
+
+Once connected, click "New Query" at the top.
+
+Copy the entire SQL script I provided earlier and paste it into the new query window.
+
+Click the "Execute" button (or press F5) to run the script. This will create your NUST_Venue_Booking database, tables, and sample data.
+
+Enable TCP/IP Connections (Crucial for Node.js):
+
+Open SQL Server Configuration Manager. You can find it by searching for it in the Start menu.
+
+In the left panel, go to SQL Server Network Configuration > Protocols for SQLEXPRESS.
+
+In the right panel, right-click TCP/IP and select Enable.
+
+Right-click TCP/IP again and select Properties. Go to the IP Addresses tab.
+
+Scroll down to the IPAll section. Clear the value for TCP Dynamic Ports (if there's a 0 in it). Set the TCP Port to 1433. Click OK to save.
+
+Restart SQL Server & Configure Firewall:
+
+In SQL Server Configuration Manager, click SQL Server Services in the left panel.
+
+Right-click SQL Server (SQLEXPRESS) in the right panel and select Restart.
+
+To allow Node.js to connect, open Windows Firewall and allow inbound connections for port 1433 for both TCP and UDP protocols.
+
+💻 Part 2: Setting Up the Backend (Node.js)
+Now you'll set up the Node.js server that connects your website to the database.
+
+Create a Project Folder:
+
+Create a new folder on your computer, for example, nust-venue-backend.
+
+Create package.json:
+
+Inside your new folder, create a file named package.json. Open it in a text editor (like Notepad), paste the following code exactly, and save the file:
+
+json
+{
+  "name": "nust-venue-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mssql": "^10.0.1",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  }
+}
+Create server.js:
+
+In the same folder, create another file named server.js.
+
+Open it and paste the entire server.js code I provided earlier. Don't forget to update the database configuration section with your SQL Server details (server name, your SQL username, and password).
+
+Open a Command Prompt / Terminal:
+
+In the folder where you created package.json and server.js, open a command prompt.
+
+To open it here, you can type cmd in the folder's address bar and press Enter.
+
+Install Dependencies:
+
+In the command prompt, type the following command and press Enter. This will install all the necessary packages listed in your package.json.
+
+bash
+npm install
+Start the Server:
+
+After the installation is complete, type the following command and press Enter to start your backend server.
+
+bash
+node server.js
+You should see a message in the terminal saying Server running on http://localhost:5000 and Connected to SQL Server. If you see errors, double-check your SQL Server configuration and credentials in server.js.
+
+💻 Part 3: Connecting the Frontend
+The final step is to ensure your website's code knows where to find the backend.
+
+Update index.html:
+
+Open the index.html file I provided.
+
+Look for the line near the top of the <script> section that says:
+
+javascript
+const API_BASE = "http://localhost:5000/api";
+Make sure the address (http://localhost:5000) matches the port your backend is running on. The default is 5000.
+
+Open the Website:
+
+Open your index.html file in your web browser. You can simply double-click the file.
+
+Test the Login:
+
+On the Login page, try the demo accounts (e.g., admin1/password123, staff_john/password123) or register a new user. If the setup was successful, you will be able to log in and your actions (like booking a venue) will be saved to the database.
+
+⚙️ Troubleshooting Common Issues
+Login fails with "Login failed for user...": This usually means the authentication mode is wrong. Make sure you enabled Mixed Mode during SQL Server setup.
+
+Node.js can't connect to SQL Server: This is often a TCP/IP issue. Double-check that you enabled the TCP/IP protocol and set the port to 1433 in SQL Server Configuration Manager.
+
+"Cannot find module..." error when running node server.js: You forgot to run npm install. Make sure you run it in the correct folder before starting the server.
