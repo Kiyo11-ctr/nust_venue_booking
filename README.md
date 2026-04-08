@@ -1,7 +1,6 @@
-# ============================================================
+
 #  NUST Venue Booking System - Backend
 #  Department of Software Engineering
-# ============================================================
 
 ## What this is
 A simple backend (server-side code) for the NUST Venue Booking System.
