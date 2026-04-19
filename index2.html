@@ -1,0 +1,251 @@
+<script>
+/* =========================
+   LOCAL STORAGE HELPERS
+========================= */
+function getUsers() {
+  return JSON.parse(localStorage.getItem('users')) || [];
+}
+function saveUsers(users) {
+  localStorage.setItem('users', JSON.stringify(users));
+}
+
+function getBookings() {
+  return JSON.parse(localStorage.getItem('bookings')) || [];
+}
+function saveBookings(data) {
+  localStorage.setItem('bookings', JSON.stringify(data));
+}
+
+/* =========================
+   SESSION MANAGEMENT
+========================= */
+function getSession() {
+  return {
+    user: localStorage.getItem('loggedInUser'),
+    role: localStorage.getItem('loggedInRole')
+  };
+}
+
+function logout() {
+  localStorage.removeItem('loggedInUser');
+  localStorage.removeItem('loggedInRole');
+  showPage('homePage');
+}
+
+/* =========================
+   PAGE CONTROL (PROTECTED)
+========================= */
+function showPage(pageId) {
+  const session = getSession();
+
+  if ((pageId === 'venuesPage' || pageId === 'adminPage') && !session.user) {
+    showMessage('loginMessage', 'Please login first.');
+    pageId = 'loginPage';
+  }
+
+  if (pageId === 'adminPage' && session.role !== 'admin') {
+    showMessage('loginMessage', 'Admin access only.');
+    pageId = 'loginPage';
+  }
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+}
+
+/* =========================
+   MESSAGES
+========================= */
+function showMessage(id, text) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.classList.add('show');
+}
+
+/* =========================
+   AUTH SYSTEM (FIXED)
+========================= */
+function registerUser() {
+  const username = document.getElementById('registerUsername').value.trim();
+  const role = document.getElementById('registerRole').value;
+
+  if (!username) {
+    showMessage('registerMessage', 'Username is required.');
+    return;
+  }
+
+  const users = getUsers();
+  if (users.find(u => u.username === username)) {
+    showMessage('registerMessage', 'Username already exists.');
+    return;
+  }
+
+  users.push({ username, role });
+  saveUsers(users);
+
+  showMessage('registerMessage', 'Registered successfully.');
+}
+
+function loginUser() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const role = document.getElementById('loginRole').value;
+
+  if (!username) {
+    showMessage('loginMessage', 'Username is required.');
+    return;
+  }
+
+  const users = getUsers();
+  const found = users.find(u => u.username === username && u.role === role);
+
+  if (!found) {
+    showMessage('loginMessage', 'User not found.');
+    return;
+  }
+
+  localStorage.setItem('loggedInUser', username);
+  localStorage.setItem('loggedInRole', role);
+
+  showMessage('loginMessage', `Welcome ${username}`);
+
+  if (role === 'admin') showPage('adminPage');
+  else showPage('venuesPage');
+}
+
+/* =========================
+   VENUES (UNCHANGED DATA)
+========================= */
+let venues = [
+  { id: 1, name: "Lecture Hall A", capacity: 200, equipment: "Projector" },
+  { id: 2, name: "Computer Lab 1", capacity: 50, equipment: "Computers" },
+  { id: 3, name: "Seminar Room B", capacity: 40, equipment: "Whiteboard" }
+];
+
+/* =========================
+   RENDER VENUES
+========================= */
+function renderVenues(list = venues) {
+  const venueList = document.getElementById('venueList');
+  const bookingVenue = document.getElementById('bookingVenue');
+  const adminVenueSelect = document.getElementById('adminVenueSelect');
+
+  venueList.innerHTML = '';
+  bookingVenue.innerHTML = '';
+  adminVenueSelect.innerHTML = '';
+
+  list.forEach(v => {
+    venueList.innerHTML += `
+      <div class="venue-card">
+        <h3>${v.name}</h3>
+        <p>Capacity: ${v.capacity}</p>
+        <p>Equipment: ${v.equipment}</p>
+        <button onclick="selectVenue(${v.id})">Book</button>
+      </div>
+    `;
+
+    bookingVenue.innerHTML += `<option value="${v.id}">${v.name}</option>`;
+    adminVenueSelect.innerHTML += `<option value="${v.id}">${v.name}</option>`;
+  });
+}
+
+/* =========================
+   FILTERING
+========================= */
+function applyFilters() {
+  const cap = Number(filterCapacity.value) || 0;
+  const eq = filterEquipment.value;
+
+  const filtered = venues.filter(v =>
+    v.capacity >= cap && (!eq || v.equipment.includes(eq))
+  );
+
+  renderVenues(filtered);
+}
+
+/* =========================
+   BOOKING SYSTEM (FIXED)
+========================= */
+function submitBooking() {
+  const venueId = Number(bookingVenue.value);
+  const date = bookingDate.value;
+  const start = bookingStart.value;
+  const end = bookingEnd.value;
+  const purpose = bookingPurpose.value.trim();
+
+  if (!venueId || !date || !start || !end || !purpose) {
+    showMessage('bookingMessage', 'All fields required.');
+    return;
+  }
+
+  if (start >= end) {
+    showMessage('bookingMessage', 'Invalid time range.');
+    return;
+  }
+
+  const venue = venues.find(v => v.id === venueId);
+  const bookings = getBookings();
+
+  bookings.push({
+    id: Date.now(),
+    venueName: venue.name,
+    date,
+    start,
+    end,
+    purpose,
+    status: 'pending'
+  });
+
+  saveBookings(bookings);
+
+  renderUserBookings();
+  renderAdminBookings();
+
+  showMessage('bookingMessage', 'Booking submitted.');
+}
+
+/* =========================
+   RENDER BOOKINGS
+========================= */
+function renderUserBookings() {
+  const list = document.getElementById('userBookingList');
+  const bookings = getBookings();
+
+  list.innerHTML = bookings.map(b => `
+    <div class="booking-card">
+      <h3>${b.venueName}</h3>
+      <p>${b.date} (${b.start}-${b.end})</p>
+      <p>${b.status}</p>
+    </div>
+  `).join('');
+}
+
+function renderAdminBookings() {
+  const list = document.getElementById('adminBookingList');
+  const bookings = getBookings();
+
+  list.innerHTML = bookings.map(b => `
+    <div class="booking-card">
+      <h3>${b.venueName}</h3>
+      <p>${b.status}</p>
+      <button onclick="updateStatus(${b.id},'approved')">Approve</button>
+      <button onclick="updateStatus(${b.id},'rejected')">Reject</button>
+    </div>
+  `).join('');
+}
+
+function updateStatus(id, status) {
+  const bookings = getBookings();
+  const b = bookings.find(x => x.id === id);
+  if (b) b.status = status;
+
+  saveBookings(bookings);
+  renderAdminBookings();
+  renderUserBookings();
+}
+
+/* =========================
+   INIT
+========================= */
+renderVenues();
+renderUserBookings();
+renderAdminBookings();
+</script>
