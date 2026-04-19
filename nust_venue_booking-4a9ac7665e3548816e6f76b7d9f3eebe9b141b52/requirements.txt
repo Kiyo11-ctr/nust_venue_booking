@@ -1,0 +1,8 @@
+# ============================================================
+#  FILE: requirements.txt
+#  PURPOSE: Lists all the Python packages this project needs.
+#  HOW TO USE: Run this command once to install everything:
+#              pip install -r requirements.txt
+# ============================================================
+
+flask
