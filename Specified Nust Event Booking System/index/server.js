@@ -12,8 +12,8 @@ app.use(bodyParser.json());
 
 // SQL Server configuration (Update with your SQL Server details)
 const dbConfig = {
-    user: 'your_username',        // Replace with your SQL username
-    password: 'your_password',    // Replace with your SQL password
+    user: 'kirubel',        // Replace with your SQL username
+    password: 'passover7',    // Replace with your SQL password
     server: 'localhost',          // e.g., 'localhost' or 'DESKTOP-XXX'
     database: 'NUST_Venue_Booking',
     options: {
