@@ -1,7 +1,7 @@
-✅ Step 0: Prerequisites
+ Step 0: Prerequisites
 Before starting, make sure you have Node.js installed. You can download it from nodejs.org.
 
-💻 Part 1: Setting Up SQL Server
+ Part 1: Setting Up SQL Server
 This involves installing the free SQL Server Express and its management tool.
 
 Install SQL Server Express:
@@ -52,7 +52,7 @@ Right-click SQL Server (SQLEXPRESS) in the right panel and select Restart.
 
 To allow Node.js to connect, open Windows Firewall and allow inbound connections for port 1433 for both TCP and UDP protocols.
 
-💻 Part 2: Setting Up the Backend (Node.js)
+ Part 2: Setting Up the Backend (Node.js)
 Now you'll set up the Node.js server that connects your website to the database.
 
 Create a Project Folder:
@@ -104,7 +104,7 @@ bash
 node server.js
 You should see a message in the terminal saying Server running on http://localhost:5000 and Connected to SQL Server. If you see errors, double-check your SQL Server configuration and credentials in server.js.
 
-💻 Part 3: Connecting the Frontend
+ Part 3: Connecting the Frontend
 The final step is to ensure your website's code knows where to find the backend.
 
 Update index.html:
@@ -125,7 +125,7 @@ Test the Login:
 
 On the Login page, try the demo accounts (e.g., admin1/password123, staff_john/password123) or register a new user. If the setup was successful, you will be able to log in and your actions (like booking a venue) will be saved to the database.
 
-⚙️ Troubleshooting Common Issues
+ Troubleshooting Common Issues
 Login fails with "Login failed for user...": This usually means the authentication mode is wrong. Make sure you enabled Mixed Mode during SQL Server setup.
 
 Node.js can't connect to SQL Server: This is often a TCP/IP issue. Double-check that you enabled the TCP/IP protocol and set the port to 1433 in SQL Server Configuration Manager.
